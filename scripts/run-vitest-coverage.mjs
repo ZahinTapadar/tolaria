@@ -18,13 +18,9 @@ const hasMaxWorkersOverride = forwardedArgs.some((arg) =>
 const maxAttempts = 2
 
 const packageManagerExec = process.env.npm_execpath
-const command = packageManagerExec ? process.execPath : 'pnpm'
-const baseCommandArgs = packageManagerExec
-  ? [packageManagerExec, 'exec', 'vitest', 'run', '--coverage']
-  : ['exec', 'vitest', 'run', '--coverage']
-const clearCacheCommandArgs = packageManagerExec
-  ? [packageManagerExec, 'exec', 'vitest', '--clearCache']
-  : ['exec', 'vitest', '--clearCache']
+const command = 'pnpm'
+const baseCommandArgs = ['exec', 'vitest', 'run', '--coverage']
+const clearCacheCommandArgs = ['exec', 'vitest', '--clearCache']
 
 function isKnownVitestInternalStateFlake(output) {
   return output.includes('Vitest failed to access its internal state.')
