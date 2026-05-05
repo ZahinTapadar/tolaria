@@ -9,7 +9,7 @@
 }
 
 .editor__blocknote-container .bn-editor {
-  font-family: var(--editor-font-family);
+  font-family: var(--font-editor);
   font-size: var(--editor-font-size);
   line-height: var(--editor-line-height);
   max-width: var(--editor-max-width);

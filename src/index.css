@@ -21,6 +21,7 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
+  --font-editor: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* --- Semantic surfaces (light mode) --- */
   --surface-app: #FFFFFF;

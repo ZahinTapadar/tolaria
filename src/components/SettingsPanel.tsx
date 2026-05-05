@@ -43,6 +43,22 @@ import {
   type ThemeMode,
   writeStoredThemeMode,
 } from '../lib/themeMode'
+import {
+  ACCENT_COLOR_DEFINITIONS,
+  DEFAULT_ACCENT_COLOR,
+  applyAccentColorToDocument,
+  readStoredAccentColor,
+  type AccentColorId,
+  writeStoredAccentColor,
+} from '../lib/accentColor'
+import {
+  DEFAULT_EDITOR_FONT,
+  EDITOR_FONT_DEFINITIONS,
+  applyEditorFontToDocument,
+  readStoredEditorFont,
+  type EditorFontId,
+  writeStoredEditorFont,
+} from '../lib/editorFont'
 import { normalizeReleaseChannel, serializeReleaseChannel, type ReleaseChannel } from '../lib/releaseChannel'
 import { shouldHideGitignoredFiles } from '../lib/gitignoredVisibility'
 import { trackEvent } from '../lib/telemetry'
@@ -99,6 +115,8 @@ interface SettingsDraft {
   aiModelProviders: AiModelProvider[]
   releaseChannel: ReleaseChannel
   themeMode: ThemeMode
+  accentColor: AccentColorId
+  editorFont: EditorFontId
   uiLanguage: UiLanguagePreference
   defaultNoteWidth: NoteWidthMode
   sidebarTypePluralizationEnabled: boolean
@@ -135,6 +153,10 @@ interface SettingsBodyProps {
   setReleaseChannel: (value: ReleaseChannel) => void
   themeMode: ThemeMode
   setThemeMode: (value: ThemeMode) => void
+  accentColor: AccentColorId
+  setAccentColor: (value: AccentColorId) => void
+  editorFont: EditorFontId
+  setEditorFont: (value: EditorFontId) => void
   uiLanguage: UiLanguagePreference
   setUiLanguage: (value: UiLanguagePreference) => void
   defaultNoteWidth: NoteWidthMode
@@ -252,6 +274,12 @@ function createSettingsDraft(
     aiModelProviders: normalizeAiModelProviders(settings.ai_model_providers),
     releaseChannel: normalizeReleaseChannel(settings.release_channel),
     themeMode: resolveSettingsDraftThemeMode(settings.theme_mode),
+    accentColor: typeof window !== 'undefined'
+      ? readStoredAccentColor(window.localStorage)
+      : DEFAULT_ACCENT_COLOR,
+    editorFont: typeof window !== 'undefined'
+      ? readStoredEditorFont(window.localStorage)
+      : DEFAULT_EDITOR_FONT,
     uiLanguage: settings.ui_language ?? SYSTEM_UI_LANGUAGE,
     defaultNoteWidth: normalizeNoteWidthMode(settings.note_width_mode) ?? DEFAULT_NOTE_WIDTH_MODE,
     sidebarTypePluralizationEnabled: settings.sidebar_type_pluralization_enabled ?? true,
@@ -440,8 +468,23 @@ function SettingsPanelInner({
   const handleThemeModeChange = useCallback((value: ThemeMode) => {
     updateDraft('themeMode', value)
     applyThemeModeSelection(value)
+    if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+      applyAccentColorToDocument(document, readStoredAccentColor(window.localStorage))
+    }
     onSave({ ...settings, theme_mode: value })
   }, [onSave, settings, updateDraft])
+
+  const handleAccentColorChange = useCallback((value: AccentColorId) => {
+    updateDraft('accentColor', value)
+    applyAccentColorToDocument(document, value)
+    writeStoredAccentColor(window.localStorage, value)
+  }, [updateDraft])
+
+  const handleEditorFontChange = useCallback((value: EditorFontId) => {
+    updateDraft('editorFont', value)
+    applyEditorFontToDocument(document, value)
+    writeStoredEditorFont(window.localStorage, value)
+  }, [updateDraft])
 
   const handleSave = useCallback(() => {
     trackTelemetryConsentChange(settings.analytics_enabled === true, draft.analytics)
@@ -495,6 +538,8 @@ function SettingsPanelInner({
           aiAgentsStatus={aiAgentsStatus}
           onCopyMcpConfig={onCopyMcpConfig}
           setThemeMode={handleThemeModeChange}
+          setAccentColor={handleAccentColorChange}
+          setEditorFont={handleEditorFontChange}
           setHideGitignoredFiles={handleGitignoredVisibilityChange}
           setAllNotesFileVisibility={handleAllNotesFileVisibilityChange}
         />
@@ -534,6 +579,8 @@ interface SettingsBodyFromDraftProps {
   aiAgentsStatus: AiAgentsStatus
   onCopyMcpConfig?: () => void
   setThemeMode: (value: ThemeMode) => void
+  setAccentColor: (value: AccentColorId) => void
+  setEditorFont: (value: EditorFontId) => void
   setHideGitignoredFiles: (value: boolean) => void
   setAllNotesFileVisibility: (value: AllNotesFileVisibility) => void
 }
@@ -548,6 +595,8 @@ function SettingsBodyFromDraft({
   aiAgentsStatus,
   onCopyMcpConfig,
   setThemeMode,
+  setAccentColor,
+  setEditorFont,
   setHideGitignoredFiles,
   setAllNotesFileVisibility,
 }: SettingsBodyFromDraftProps) {
@@ -579,6 +628,10 @@ function SettingsBodyFromDraft({
       setReleaseChannel={(value) => updateDraft('releaseChannel', value)}
       themeMode={draft.themeMode}
       setThemeMode={setThemeMode}
+      accentColor={draft.accentColor}
+      setAccentColor={setAccentColor}
+      editorFont={draft.editorFont}
+      setEditorFont={setEditorFont}
       uiLanguage={draft.uiLanguage}
       setUiLanguage={(value) => updateDraft('uiLanguage', value)}
       defaultNoteWidth={draft.defaultNoteWidth}
@@ -663,6 +716,10 @@ function SettingsSyncAndAppearanceSections({
   setReleaseChannel,
   themeMode,
   setThemeMode,
+  accentColor,
+  setAccentColor,
+  editorFont,
+  setEditorFont,
   uiLanguage,
   setUiLanguage,
 }: SettingsBodyProps) {
@@ -697,6 +754,10 @@ function SettingsSyncAndAppearanceSections({
             t={t}
             themeMode={themeMode}
             setThemeMode={setThemeMode}
+            accentColor={accentColor}
+            setAccentColor={setAccentColor}
+            editorFont={editorFont}
+            setEditorFont={setEditorFont}
           />
           <LanguageSettingsSection
             t={t}
@@ -847,14 +908,31 @@ function SyncAndUpdatesSection({
 }
 
 function AppearanceSettingsSection({
-  t,
-  themeMode,
-  setThemeMode,
-}: Pick<SettingsBodyProps, 't' | 'themeMode' | 'setThemeMode'>) {
+  t, themeMode, setThemeMode, accentColor, setAccentColor, editorFont, setEditorFont,
+}: Pick<SettingsBodyProps,
+  't' | 'themeMode' | 'setThemeMode' | 'accentColor' | 'setAccentColor'
+  | 'editorFont' | 'setEditorFont'>) {
   return (
-    <SettingsRow label={t('settings.theme.label')} description={t('settings.appearance.description')}>
-      <ThemeModeControl value={themeMode} onChange={setThemeMode} t={t} />
-    </SettingsRow>
+    <>
+      <SettingsRow
+        label={t('settings.theme.label')}
+        description={t('settings.appearance.description')}
+      >
+        <ThemeModeControl value={themeMode} onChange={setThemeMode} t={t} />
+      </SettingsRow>
+      <SettingsRow
+        label="Accent color"
+        description="Color used for links, selections, and interactive highlights."
+      >
+        <AccentColorControl value={accentColor} onChange={setAccentColor} />
+      </SettingsRow>
+      <SettingsRow
+        label="Editor font"
+        description="Font used in the note editor."
+      >
+        <EditorFontControl value={editorFont} onChange={setEditorFont} />
+      </SettingsRow>
+    </>
   )
 }
 
@@ -919,6 +997,50 @@ function ThemeModeButton({
       {children}
       {label}
     </Button>
+  )
+}
+
+function AccentColorControl({
+  value, onChange,
+}: { value: AccentColorId; onChange: (value: AccentColorId) => void }) {
+  return (
+    <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Accent color">
+      {ACCENT_COLOR_DEFINITIONS.map((def) => (
+        <Button
+          key={def.id}
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          role="radio"
+          aria-checked={value === def.id}
+          aria-label={def.label}
+          title={def.label}
+          onClick={() => onChange(def.id)}
+          style={{ backgroundColor: def.light.base }}
+          className={[
+            'h-6 w-6 rounded-full border-2 transition-transform hover:scale-110',
+            value === def.id ? 'border-foreground scale-110' : 'border-transparent',
+          ].join(' ')}
+        />
+      ))}
+    </div>
+  )
+}
+
+function EditorFontControl({
+  value, onChange,
+}: { value: EditorFontId; onChange: (value: EditorFontId) => void }) {
+  return (
+    <SelectControl
+      ariaLabel="Editor font"
+      value={value}
+      onValueChange={(v) => onChange(v as EditorFontId)}
+      options={EDITOR_FONT_DEFINITIONS.map((def) => ({
+        value: def.id,
+        label: def.label,
+      }))}
+      testId="settings-editor-font"
+    />
   )
 }
 

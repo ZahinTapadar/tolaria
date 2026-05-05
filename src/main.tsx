@@ -7,6 +7,8 @@ import App from './App.tsx'
 import { FrontendReadyMarker } from './components/FrontendReadyMarker'
 import { LinuxTitlebar } from './components/LinuxTitlebar'
 import { applyStoredThemeMode } from './lib/themeMode'
+import { applyAccentColorToDocument, readStoredAccentColor } from './lib/accentColor'
+import { applyEditorFontToDocument, readStoredEditorFont } from './lib/editorFont'
 import {
   APP_COMMAND_EVENT_NAME,
   isAppCommandId,
@@ -57,6 +59,8 @@ if (shouldUseLinuxWindowChrome()) {
 }
 
 applyStoredThemeMode(document, window.localStorage)
+applyAccentColorToDocument(document, readStoredAccentColor(window.localStorage))
+applyEditorFontToDocument(document, readStoredEditorFont(window.localStorage))
 
 function dispatchDeterministicShortcutEvent(init: AppCommandShortcutEventInit) {
   const target =
