@@ -1,4 +1,10 @@
 export type EditorFontId =
+  | 'bear-sans'
+  | 'funnel-sans'
+  | 'funnel-display'
+  | 'paragon'
+  | 'sinistre'
+  | 'williwaw'
   | 'inter'
   | 'georgia'
   | 'ibm-plex-serif'
@@ -13,6 +19,36 @@ export interface EditorFontDefinition {
 }
 
 export const EDITOR_FONT_DEFINITIONS: EditorFontDefinition[] = [
+  {
+    id: 'bear-sans',
+    label: 'Bear Sans UI',
+    stack: "'Bear Sans UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  {
+    id: 'funnel-sans',
+    label: 'Funnel Sans',
+    stack: "'Funnel Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  {
+    id: 'funnel-display',
+    label: 'Funnel Display',
+    stack: "'Funnel Display', Georgia, serif",
+  },
+  {
+    id: 'paragon',
+    label: 'Paragon',
+    stack: "'Paragon', Georgia, serif",
+  },
+  {
+    id: 'sinistre',
+    label: 'Sinistre',
+    stack: "'Sinistre', Georgia, serif",
+  },
+  {
+    id: 'williwaw',
+    label: 'Williwaw',
+    stack: "'Williwaw', Georgia, serif",
+  },
   {
     id: 'inter',
     label: 'Inter',
@@ -44,7 +80,7 @@ export const EDITOR_FONT_DEFINITIONS: EditorFontDefinition[] = [
 ]
 
 export const EDITOR_FONT_STORAGE_KEY = 'tolaria-editor-font'
-export const DEFAULT_EDITOR_FONT: EditorFontId = 'inter'
+export const DEFAULT_EDITOR_FONT: EditorFontId = 'bear-sans'
 
 const EDITOR_FONT_IDS = new Set<EditorFontId>(EDITOR_FONT_DEFINITIONS.map((def) => def.id))
 
