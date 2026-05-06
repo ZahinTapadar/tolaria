@@ -170,3 +170,4 @@ proposed → active → superseded
 | [0114](0114-python-editor-output-capture.md) | Python editor output capture for plots | active |
 | [0115](0115-editor-close-button.md) | Editor close button for note pane | active |
 | [0116](0116-note-folder-organization.md) | Hierarchical folder organization for notes, code, and images | active |
+| [0117](0117-tag-system-replacing-views.md) | Tag system replacing views | active |

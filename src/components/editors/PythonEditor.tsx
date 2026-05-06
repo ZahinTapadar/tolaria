@@ -7,7 +7,7 @@ import { githubLight } from '@uiw/codemirror-theme-github'
 import { python } from '@codemirror/lang-python'
 import CodeMirror from '@uiw/react-codemirror'
 import { useDocumentThemeMode } from '../../hooks/useDocumentThemeMode'
-import { translate, type AppLocale } from '../../lib/i18n'
+import { type AppLocale } from '../../lib/i18n'
 
 interface PythonEditorProps {
   locale: AppLocale
@@ -28,8 +28,8 @@ def greet(name):
 
 print(greet("Developer"))`
 
-export function PythonEditor({ locale, onSaveCode, onSaveImages: onSaveImagesProp }: PythonEditorProps) {
-  const { isLoading, isReady, error, runPythonWithAutoInstall, writeFile, readFile, readDir } = usePyodide()
+export function PythonEditor({ locale: _locale, onSaveCode, onSaveImages: onSaveImagesProp }: PythonEditorProps) {
+  const { isLoading: _isLoading, isReady, error, runPythonWithAutoInstall, writeFile, readFile, readDir } = usePyodide()
   const [code, setCode] = useState(DEFAULT_CODE)
   const [output, setOutput] = useState<{ text: string; isError: boolean; isImage?: boolean; isHtml?: boolean; id?: string }[]>([])
   const [progress, setProgress] = useState<string>('')

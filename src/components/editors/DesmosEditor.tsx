@@ -3,13 +3,13 @@ import { Graph, MagicWand, ArrowCounterClockwise } from '@phosphor-icons/react'
 import { Button } from '../ui/button'
 import { useDesmos } from './hooks/useDesmos'
 import { useDocumentThemeMode } from '../../hooks/useDocumentThemeMode'
-import { translate, type AppLocale } from '../../lib/i18n'
+import { type AppLocale } from '../../lib/i18n'
 
 interface DesmosEditorProps {
   locale: AppLocale
 }
 
-export function DesmosEditor({ locale }: DesmosEditorProps) {
+export function DesmosEditor({ locale: _locale }: DesmosEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const theme = useDocumentThemeMode()
   const isDark = theme === 'dark'

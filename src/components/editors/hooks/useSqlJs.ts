@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-interface SqlJsInstance {
-  SQL: SqlJsStatic | null
-  db: Database | null
-}
-
 interface SqlJsStatic {
   Database: new (data?: Uint8Array) => Database
 }

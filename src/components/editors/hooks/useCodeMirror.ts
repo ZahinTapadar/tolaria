@@ -21,7 +21,7 @@ export function useCodeMirror(options: UseCodeMirrorOptions): {
 } {
   const ref = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const [mounted, setMounted] = useState(false)
+  const [_mounted, setMounted] = useState(false)
 
   useEffect(() => {
     if (!ref.current || viewRef.current) return

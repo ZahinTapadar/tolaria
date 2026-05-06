@@ -6,7 +6,7 @@ import { githubLight } from '@uiw/codemirror-theme-github'
 import { cpp } from '@codemirror/lang-cpp'
 import CodeMirror from '@uiw/react-codemirror'
 import { useDocumentThemeMode } from '../../hooks/useDocumentThemeMode'
-import { translate, type AppLocale } from '../../lib/i18n'
+import { type AppLocale } from '../../lib/i18n'
 
 interface CppEditorProps {
   locale: AppLocale
@@ -21,7 +21,7 @@ int main() {
     return 0;
 }`
 
-export function CppEditor({ locale }: CppEditorProps) {
+export function CppEditor({ locale: _locale }: CppEditorProps) {
   const [code, setCode] = useState(DEFAULT_CODE)
   const [output, setOutput] = useState<string>('Emscripten WebAssembly Toolchain Ready!\nNote: Full in-browser LLVM compilation requires extensive memory. This is a local execution sandbox.\n\n')
   const [isCompiling, setIsCompiling] = useState(false)

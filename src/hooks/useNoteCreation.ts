@@ -9,6 +9,7 @@ import { cacheNoteContent } from './useTabManagement'
 import { findByCollidingNotePath, joinVaultPath, notePathFilename } from '../utils/notePathIdentity'
 import { canonicalFrontmatterKey } from '../utils/systemMetadata'
 import { canonicalizeTypeName } from '../utils/vaultTypes'
+import { getNoteFolderPaths, ensureDirectory } from '../utils/noteFolderPaths'
 
 export interface NewEntryParams {
   path: string
@@ -221,7 +222,11 @@ export interface NewNoteParams {
 export function resolveNewNote({ title, type, vaultPath, template, defaults = [] }: NewNoteParams): { entry: VaultEntry; content: string } {
   const slug = slugify(title)
   const status = null
-  const entry = buildNewEntry({ path: joinVaultPath(vaultPath, `${slug}.md`), slug, title, type, status })
+  
+  // Use folder structure: Notes/{Note-Title}/{Note-Title}.md
+  const paths = getNoteFolderPaths(vaultPath, title)
+  const entry = buildNewEntry({ path: paths.notePath, slug, title, type, status })
+  
   return applyTypeDefaults({
     entry,
     content: buildNoteContent({ title, type, status, template, defaults }),
@@ -425,6 +430,11 @@ interface PersistCallbacks {
 async function persistOptimistic(path: string, content: string, cbs: PersistCallbacks): Promise<void> {
   cbs.onStart?.(path)
   try {
+    // Ensure parent directories exist for folder structure
+    const dirPath = path.substring(0, path.lastIndexOf('/'))
+    if (dirPath) {
+      await ensureDirectory(dirPath)
+    }
     await persistNewNote(path, content)
     cbs.onPersisted?.(path)
   } finally {

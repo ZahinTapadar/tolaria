@@ -14,15 +14,6 @@ interface DesmosColors {
 }
 
 
-interface DesmosOptions {
-  keypad?: boolean
-  expressions?: boolean
-  settingsMenu?: boolean
-  zoomButtons?: boolean
-  expressionsTopbar?: boolean
-  colors?: DesmosColors
-}
-
 export interface UseDesmosResult {
   isLoading: boolean
   isReady: boolean
