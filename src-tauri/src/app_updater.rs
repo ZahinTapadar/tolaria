@@ -2,7 +2,7 @@ use serde::Serialize;
 use tauri::{ipc::Channel, AppHandle, Runtime, Url};
 use tauri_plugin_updater::UpdaterExt;
 
-const RELEASES_BASE_URL: &str = "https://refactoringhq.github.io/tolaria";
+const RELEASES_BASE_URL: &str = "https://zahintapadar.github.io/tolaria";
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -170,11 +170,11 @@ mod tests {
     fn release_channel_endpoints_match_expected_paths() {
         assert_eq!(
             ReleaseChannel::Alpha.updater_endpoint().unwrap().as_str(),
-            "https://refactoringhq.github.io/tolaria/alpha/latest.json"
+            "https://zahintapadar.github.io/tolaria/alpha/latest.json"
         );
         assert_eq!(
             ReleaseChannel::Stable.updater_endpoint().unwrap().as_str(),
-            "https://refactoringhq.github.io/tolaria/stable/latest.json"
+            "https://zahintapadar.github.io/tolaria/stable/latest.json"
         );
     }
 

@@ -72,7 +72,7 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://refactoringhq.github.io/tolaria/stable/latest.json"
+        "https://zahintapadar.github.io/tolaria/stable/latest.json"
       ],
       "windows": {
         "installMode": "passive"
