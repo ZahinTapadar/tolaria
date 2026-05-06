@@ -155,8 +155,8 @@
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
 
-  /* --- Font defaults (driven by --font-editor so JS changes apply app-wide) --- */
-  font-family: var(--font-editor, 'Bear Sans UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  /* --- Font defaults --- */
+  font-family: 'Bear Sans UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-size: 14px;

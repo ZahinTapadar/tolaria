@@ -9,7 +9,7 @@ import { cacheNoteContent } from './useTabManagement'
 import { findByCollidingNotePath, joinVaultPath, notePathFilename } from '../utils/notePathIdentity'
 import { canonicalFrontmatterKey } from '../utils/systemMetadata'
 import { canonicalizeTypeName } from '../utils/vaultTypes'
-import { getNoteFolderPaths, ensureDirectory } from '../utils/noteFolderPaths'
+import { ensureDirectory } from '../utils/noteFolderPaths'
 
 export interface NewEntryParams {
   path: string
@@ -222,11 +222,7 @@ export interface NewNoteParams {
 export function resolveNewNote({ title, type, vaultPath, template, defaults = [] }: NewNoteParams): { entry: VaultEntry; content: string } {
   const slug = slugify(title)
   const status = null
-  
-  // Use folder structure: Notes/{Note-Title}/{Note-Title}.md
-  const paths = getNoteFolderPaths(vaultPath, title)
-  const entry = buildNewEntry({ path: paths.notePath, slug, title, type, status })
-  
+  const entry = buildNewEntry({ path: joinVaultPath(vaultPath, `${slug}.md`), slug, title, type, status })
   return applyTypeDefaults({
     entry,
     content: buildNoteContent({ title, type, status, template, defaults }),

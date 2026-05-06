@@ -137,4 +137,5 @@ export function applyEditorFontToDocument(doc: Document, id: EditorFontId): void
 
   if (definition.googleFontsUrl) ensureFontLoaded(definition.googleFontsUrl)
   root.style.setProperty('--font-editor', definition.stack)
+  root.style.setProperty('font-family', definition.stack)
 }
