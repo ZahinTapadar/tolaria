@@ -33,6 +33,11 @@ export function selectionsEqual(a: SidebarSelection, b: SidebarSelection): boole
       if (a.mode === 'global' || other.mode === 'global') return a.mode === other.mode
       return a.focus.path === other.focus.path
     }
+    case 'python':
+    case 'sqlite':
+    case 'desmos':
+    case 'cpp':
+      return true
     case 'filter':
       return isSameFilterSelection(a, b as Extract<SidebarSelection, { kind: 'filter' }>)
     case 'sectionGroup':

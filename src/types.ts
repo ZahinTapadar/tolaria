@@ -209,6 +209,10 @@ export type GraphMode = 'global' | 'local'
 export type SidebarSelection =
   | { kind: 'graph'; mode: 'global' }
   | { kind: 'graph'; mode: 'local'; focus: VaultEntry; depth: number }
+  | { kind: 'python' }
+  | { kind: 'sqlite' }
+  | { kind: 'desmos' }
+  | { kind: 'cpp' }
   | { kind: 'filter'; filter: SidebarFilter }
   | { kind: 'sectionGroup'; type: string }
   | { kind: 'folder'; path: string; rootPath?: string }

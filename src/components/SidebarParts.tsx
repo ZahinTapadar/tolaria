@@ -41,6 +41,10 @@ export function isSelectionActive(current: SidebarSelection, check: SidebarSelec
       if (a.mode === 'global' || b.mode === 'global') return a.mode === b.mode
       return a.focus.path === b.focus.path
     }
+    case 'python': return true
+    case 'sqlite': return true
+    case 'desmos': return true
+    case 'cpp': return true
     case 'filter': return (current as typeof check).filter === check.filter
     case 'sectionGroup': return (current as typeof check).type === check.type
     case 'folder': return (current as typeof check).path === check.path

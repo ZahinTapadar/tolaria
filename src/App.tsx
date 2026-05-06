@@ -13,6 +13,7 @@ import { Toast } from './components/Toast'
 import { CommitDialog } from './components/CommitDialog'
 import { PulseView } from './components/PulseView'
 import { GraphView } from './components/GraphView'
+import { EditorContainer } from './components/editors/EditorContainer'
 import { StatusBar } from './components/StatusBar'
 import { SettingsPanel } from './components/SettingsPanel'
 import { CloneVaultModal } from './components/CloneVaultModal'
@@ -35,6 +36,7 @@ import { useSettings } from './hooks/useSettings'
 import { useNoteWidthMode } from './hooks/useNoteWidthMode'
 import { useDocumentThemeMode } from './hooks/useDocumentThemeMode'
 import { useThemeMode } from './hooks/useThemeMode'
+import { persistContent } from './hooks/useSaveNote'
 import type { ThemeMode } from './lib/themeMode'
 import { useNoteActions } from './hooks/useNoteActions'
 import { planNewTypeCreation } from './hooks/useNoteCreation'
@@ -1514,14 +1516,7 @@ function App() {
     return entries
   }, [reloadVaultForCommand, setToastMessage])
 
-  const {
-    activeTab,
-    defaultNoteWidth,
-    noteWidth: activeNoteWidth,
-    setDefaultNoteWidth: handleSetDefaultNoteWidth,
-    setNoteWidth: handleSetActiveNoteWidth,
-    toggleNoteWidth: handleToggleNoteWidth,
-  } = useNoteWidthMode({
+  const { activeTab, defaultNoteWidth, noteWidth: activeNoteWidth, setDefaultNoteWidth: handleSetDefaultNoteWidth, setNoteWidth: handleSetActiveNoteWidth, toggleNoteWidth: handleToggleNoteWidth } = useNoteWidthMode({
     tabs: notes.tabs,
     activeTabPath: notes.activeTabPath,
     settings,
@@ -1713,6 +1708,165 @@ function App() {
   const isVaultContentLoading = !noteWindowParams && (isStartupLoading || (onboarding.state.status === 'ready' && vault.isLoading))
 
   const isGraphMode = effectiveSelection.kind === 'graph'
+  const isEditorMode = ['python', 'sqlite', 'desmos', 'cpp'].includes(effectiveSelection.kind)
+
+  const handleSavePythonCode = useCallback(async (code: string, title: string, plots: string[]) => {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    const filename = `python-${timestamp}.md`
+    
+    // Build content with code and embedded plots
+    let content = `---\ntitle: ${title}\ncreated: ${new Date().toISOString()}\ntype: code\n---\n\n## Code\n\n\`\`\`python\n${code}\n\`\`\`\n`
+    
+    // Add plots section if there are any
+    if (plots.length > 0) {
+      content += '\n## Output\n\n'
+      plots.forEach((plot, idx) => {
+        const isHtml = plot.trim().startsWith('<')
+        if (isHtml) {
+          // Embed plotly HTML directly (markdown supports raw HTML)
+          content += `### Plot ${idx + 1}\n\n${plot}\n\n`
+        } else {
+          // Embed matplotlib as base64 image
+          content += `### Plot ${idx + 1}\n\n![Plot ${idx + 1}](data:image/png;base64,${plot})\n\n`
+        }
+      })
+    }
+    
+    const path = `${resolvedPath}/${filename}`
+    await persistContent(path, content)
+    vault.addEntry({
+      path,
+      filename,
+      title,
+      isA: null,
+      aliases: [],
+      belongsTo: [],
+      relatedTo: [],
+      status: null,
+      createdAt: Date.now(),
+      modifiedAt: Date.now(),
+      fileSize: content.length,
+      snippet: code.slice(0, 200),
+      wordCount: code.split(/\s+/).length,
+      relationships: {},
+      archived: false,
+      icon: null,
+      color: null,
+      order: null,
+      sidebarLabel: null,
+      template: null,
+      sort: null,
+      view: null,
+      visible: null,
+      organized: true,
+      favorite: false,
+      favoriteIndex: null,
+      listPropertiesDisplay: [],
+      outgoingLinks: [],
+      properties: {},
+      hasH1: false,
+    })
+    setToastMessage(`Saved ${filename}`)
+  }, [resolvedPath, vault.addEntry])
+
+  const handleSavePythonImages = useCallback(async (plots: string[], titles: string[]) => {
+    for (let idx = 0; idx < plots.length; idx++) {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+      const plotData = plots[idx]
+      // Check if it's HTML (plotly) or base64 image (matplotlib)
+      const isHtml = plotData.trim().startsWith('<')
+      if (isHtml) {
+        // Save as HTML file with embedded plotly
+        const filename = `plot-${idx + 1}-${timestamp}.html`
+        const content = `<!DOCTYPE html>
+<html>
+<head>
+  <title>${titles[idx]}</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  ${plotData}
+</body>
+</html>`
+        const path = `${resolvedPath}/${filename}`
+        await persistContent(path, content)
+        vault.addEntry({
+          path,
+          filename,
+          title: titles[idx],
+          isA: null,
+          aliases: [],
+          belongsTo: [],
+          relatedTo: [],
+          status: null,
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          fileSize: content.length,
+          snippet: titles[idx],
+          wordCount: 1,
+          relationships: {},
+          archived: false,
+          icon: null,
+          color: null,
+          order: null,
+          sidebarLabel: null,
+          template: null,
+          sort: null,
+          view: null,
+          visible: null,
+          organized: true,
+          favorite: false,
+          favoriteIndex: null,
+          listPropertiesDisplay: [],
+          outgoingLinks: [],
+          properties: {},
+          hasH1: false,
+        })
+      } else {
+        // Save as markdown with base64 image
+        const filename = `plot-${idx + 1}-${timestamp}.md`
+        const content = `---\ntitle: ${titles[idx]}\ncreated: ${new Date().toISOString()}\ntype: image\n---\n\n![${titles[idx]}](data:image/png;base64,${plotData})\n`
+        const path = `${resolvedPath}/${filename}`
+        // Save content to file
+        await persistContent(path, content)
+        // Add entry to vault
+        vault.addEntry({
+          path,
+          filename,
+          title: titles[idx],
+          isA: null,
+          aliases: [],
+          belongsTo: [],
+          relatedTo: [],
+          status: null,
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          fileSize: content.length,
+          snippet: titles[idx],
+          wordCount: 1,
+          relationships: {},
+          archived: false,
+          icon: null,
+          color: null,
+          order: null,
+          sidebarLabel: null,
+          template: null,
+          sort: null,
+          view: null,
+          visible: null,
+          organized: true,
+          favorite: false,
+          favoriteIndex: null,
+          listPropertiesDisplay: [],
+          outgoingLinks: [],
+          properties: {},
+          hasH1: false,
+        })
+      }
+    }
+    setToastMessage(`Saved ${plots.length} plot${plots.length > 1 ? 's' : ''}`)
+  }, [resolvedPath, vault.addEntry])
+
   const editorElement = (
     <Editor
       tabs={notes.tabs}
@@ -1794,7 +1948,7 @@ function App() {
               <ResizeHandle onResize={layout.handleSidebarResize} />
             </>
           )}
-          {noteListVisible && effectiveSelection.kind !== 'graph' && (
+          {noteListVisible && effectiveSelection.kind !== 'graph' && !isEditorMode && (
             <>
               <div className={`app__note-list${aiActivity.highlightElement === 'notelist' ? ' ai-highlight' : ''}`} style={{ width: layout.noteListWidth }}>
                 {effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'pulse' ? (
@@ -1818,6 +1972,17 @@ function App() {
                 rightPane={notes.tabs.length > 0 ? editorElement : undefined}
                 rightPaneWidth={notes.tabs.length > 0 ? layout.graphEditorWidth : undefined}
                 onRightPaneResize={notes.tabs.length > 0 ? layout.handleGraphEditorResize : undefined}
+              />
+            ) : isEditorMode ? (
+              <EditorContainer
+                kind={effectiveSelection.kind as 'python' | 'sqlite' | 'desmos' | 'cpp'}
+                locale={appLocale}
+                rightPane={notes.tabs.length > 0 ? editorElement : undefined}
+                rightPaneWidth={notes.tabs.length > 0 ? layout.graphEditorWidth : undefined}
+                onRightPaneResize={notes.tabs.length > 0 ? layout.handleGraphEditorResize : undefined}
+                onCloseRightPane={notes.tabs.length > 0 ? notes.closeAllTabs : undefined}
+                onSavePythonCode={handleSavePythonCode}
+                onSavePythonImages={handleSavePythonImages}
               />
             ) : (
               editorElement
