@@ -12,6 +12,7 @@ import { SearchPanel } from './components/SearchPanel'
 import { Toast } from './components/Toast'
 import { CommitDialog } from './components/CommitDialog'
 import { PulseView } from './components/PulseView'
+import { GraphView } from './components/GraphView'
 import { StatusBar } from './components/StatusBar'
 import { SettingsPanel } from './components/SettingsPanel'
 import { CloneVaultModal } from './components/CloneVaultModal'
@@ -1711,6 +1712,77 @@ function App() {
 
   const isVaultContentLoading = !noteWindowParams && (isStartupLoading || (onboarding.state.status === 'ready' && vault.isLoading))
 
+  const isGraphMode = effectiveSelection.kind === 'graph'
+  const editorElement = (
+    <Editor
+      tabs={notes.tabs}
+      activeTabPath={notes.activeTabPath}
+      isVaultLoading={isVaultContentLoading}
+      entries={noteWindowParams && activeTab ? [activeTab.entry] : vault.entries}
+      onNavigateWikilink={notes.handleNavigateWikilink}
+      onLoadDiff={vault.loadDiff}
+      onLoadDiffAtCommit={vault.loadDiffAtCommit}
+      pendingCommitDiffRequest={pendingDiffRequest}
+      onPendingCommitDiffHandled={handlePendingDiffHandled}
+      getNoteStatus={vault.getNoteStatus}
+      onCreateNote={notes.handleCreateNoteImmediate}
+      inspectorCollapsed={layout.inspectorCollapsed}
+      onToggleInspector={handleToggleInspector}
+      inspectorWidth={layout.inspectorWidth}
+      defaultAiAgent={aiAgentPreferences.defaultAiAgent}
+      defaultAiTarget={aiAgentPreferences.defaultAiTarget}
+      defaultAiAgentReadiness={aiAgentPreferences.defaultAiAgentReadiness}
+      defaultAiAgentReady={aiAgentPreferences.defaultAiAgentReady}
+      onUnsupportedAiPaste={setToastMessage}
+      onInspectorResize={layout.handleInspectorResize}
+      inspectorEntry={activeTab?.entry ?? null}
+      inspectorContent={activeTab?.content ?? null}
+      gitHistory={gitHistory}
+      onUpdateFrontmatter={notes.handleUpdateFrontmatter}
+      onDeleteProperty={notes.handleDeleteProperty}
+      onAddProperty={notes.handleAddProperty}
+      onCreateMissingType={handleCreateMissingType}
+      onCreateAndOpenNote={notes.handleCreateNoteForRelationship}
+      onInitializeProperties={handleInitializeProperties}
+      showAIChat={dialogs.showAIChat}
+      onToggleAIChat={dialogs.toggleAIChat}
+      vaultPath={resolvedPath}
+      noteList={aiNoteList}
+      noteListFilter={aiNoteListFilter}
+      onToggleFavorite={activeDeletedFile ? undefined : entryActions.handleToggleFavorite}
+      onToggleOrganized={activeDeletedFile || !explicitOrganizationEnabled ? undefined : toggleOrganizedCommand}
+      onEnterNeighborhood={activeDeletedFile ? undefined : handleEnterNeighborhood}
+      onRevealFile={fileActions.revealFile}
+      onCopyFilePath={fileActions.copyFilePath}
+      onOpenExternalFile={fileActions.openExternalFile}
+      onDeleteNote={activeDeletedFile ? undefined : deleteActions.handleDeleteNote}
+      onArchiveNote={activeDeletedFile ? undefined : entryActions.handleArchiveNote}
+      onUnarchiveNote={activeDeletedFile ? undefined : entryActions.handleUnarchiveNote}
+      onContentChange={handleTrackedContentChange}
+      onSave={handleTrackedSave}
+      onRenameFilename={activeDeletedFile ? undefined : appSave.handleFilenameRename}
+      noteWidth={activeNoteWidth}
+      onToggleNoteWidth={handleToggleNoteWidth}
+      rawToggleRef={rawToggleRef}
+      findInNoteRef={findInNoteRef}
+      diffToggleRef={diffToggleRef}
+      canGoBack={canGoBack}
+      canGoForward={canGoForward}
+      onGoBack={handleGoBack}
+      onGoForward={handleGoForward}
+      leftPanelsCollapsed={!sidebarVisible && !noteListVisible}
+      onFileCreated={vaultBridge.handleAgentFileCreated}
+      onFileModified={vaultBridge.handleAgentFileModified}
+      onVaultChanged={vaultBridge.handleAgentVaultChanged}
+      isConflicted={conflictFlow.isConflicted}
+      onKeepMine={conflictFlow.handleKeepMine}
+      onKeepTheirs={conflictFlow.handleKeepTheirs}
+      flushPendingEditorContentRef={flushPendingEditorContentRef}
+      flushPendingRawContentRef={flushPendingRawContentRef}
+      locale={appLocale}
+    />
+  )
+
   return (
     <div className="app-shell">
         <div className="app">
@@ -1722,7 +1794,7 @@ function App() {
               <ResizeHandle onResize={layout.handleSidebarResize} />
             </>
           )}
-          {noteListVisible && (
+          {noteListVisible && effectiveSelection.kind !== 'graph' && (
             <>
               <div className={`app__note-list${aiActivity.highlightElement === 'notelist' ? ' ai-highlight' : ''}`} style={{ width: layout.noteListWidth }}>
                 {effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'pulse' ? (
@@ -1735,73 +1807,21 @@ function App() {
             </>
           )}
           <div className={`app__editor${aiActivity.highlightElement === 'editor' || aiActivity.highlightElement === 'tab' ? ' ai-highlight' : ''}`}>
-            <Editor
-              tabs={notes.tabs}
-              activeTabPath={notes.activeTabPath}
-              isVaultLoading={isVaultContentLoading}
-              entries={noteWindowParams && activeTab ? [activeTab.entry] : vault.entries}
-              onNavigateWikilink={notes.handleNavigateWikilink}
-              onLoadDiff={vault.loadDiff}
-              onLoadDiffAtCommit={vault.loadDiffAtCommit}
-              pendingCommitDiffRequest={pendingDiffRequest}
-              onPendingCommitDiffHandled={handlePendingDiffHandled}
-              getNoteStatus={vault.getNoteStatus}
-              onCreateNote={notes.handleCreateNoteImmediate}
-              inspectorCollapsed={layout.inspectorCollapsed}
-              onToggleInspector={handleToggleInspector}
-              inspectorWidth={layout.inspectorWidth}
-              defaultAiAgent={aiAgentPreferences.defaultAiAgent}
-              defaultAiTarget={aiAgentPreferences.defaultAiTarget}
-              defaultAiAgentReadiness={aiAgentPreferences.defaultAiAgentReadiness}
-              defaultAiAgentReady={aiAgentPreferences.defaultAiAgentReady}
-              onUnsupportedAiPaste={setToastMessage}
-              onInspectorResize={layout.handleInspectorResize}
-              inspectorEntry={activeTab?.entry ?? null}
-              inspectorContent={activeTab?.content ?? null}
-              gitHistory={gitHistory}
-              onUpdateFrontmatter={notes.handleUpdateFrontmatter}
-              onDeleteProperty={notes.handleDeleteProperty}
-              onAddProperty={notes.handleAddProperty}
-              onCreateMissingType={handleCreateMissingType}
-              onCreateAndOpenNote={notes.handleCreateNoteForRelationship}
-              onInitializeProperties={handleInitializeProperties}
-              showAIChat={dialogs.showAIChat}
-              onToggleAIChat={dialogs.toggleAIChat}
-              vaultPath={resolvedPath}
-              noteList={aiNoteList}
-              noteListFilter={aiNoteListFilter}
-              onToggleFavorite={activeDeletedFile ? undefined : entryActions.handleToggleFavorite}
-              onToggleOrganized={activeDeletedFile || !explicitOrganizationEnabled ? undefined : toggleOrganizedCommand}
-              onEnterNeighborhood={activeDeletedFile ? undefined : handleEnterNeighborhood}
-              onRevealFile={fileActions.revealFile}
-              onCopyFilePath={fileActions.copyFilePath}
-              onOpenExternalFile={fileActions.openExternalFile}
-              onDeleteNote={activeDeletedFile ? undefined : deleteActions.handleDeleteNote}
-              onArchiveNote={activeDeletedFile ? undefined : entryActions.handleArchiveNote}
-              onUnarchiveNote={activeDeletedFile ? undefined : entryActions.handleUnarchiveNote}
-              onContentChange={handleTrackedContentChange}
-              onSave={handleTrackedSave}
-              onRenameFilename={activeDeletedFile ? undefined : appSave.handleFilenameRename}
-              noteWidth={activeNoteWidth}
-              onToggleNoteWidth={handleToggleNoteWidth}
-              rawToggleRef={rawToggleRef}
-              findInNoteRef={findInNoteRef}
-              diffToggleRef={diffToggleRef}
-              canGoBack={canGoBack}
-              canGoForward={canGoForward}
-              onGoBack={handleGoBack}
-              onGoForward={handleGoForward}
-              leftPanelsCollapsed={!sidebarVisible && !noteListVisible}
-              onFileCreated={vaultBridge.handleAgentFileCreated}
-              onFileModified={vaultBridge.handleAgentFileModified}
-              onVaultChanged={vaultBridge.handleAgentVaultChanged}
-              isConflicted={conflictFlow.isConflicted}
-              onKeepMine={conflictFlow.handleKeepMine}
-              onKeepTheirs={conflictFlow.handleKeepTheirs}
-              flushPendingEditorContentRef={flushPendingEditorContentRef}
-              flushPendingRawContentRef={flushPendingRawContentRef}
-              locale={appLocale}
-            />
+            {isGraphMode ? (
+              <GraphView
+                entries={vault.entries}
+                selection={effectiveSelection as SidebarSelection & { kind: 'graph' }}
+                selectedPath={activeTab?.entry?.path ?? null}
+                onSelectNote={notes.handleSelectNote}
+                onSetSelection={handleSetSelection}
+                locale={appLocale}
+                rightPane={notes.tabs.length > 0 ? editorElement : undefined}
+                rightPaneWidth={notes.tabs.length > 0 ? layout.graphEditorWidth : undefined}
+                onRightPaneResize={notes.tabs.length > 0 ? layout.handleGraphEditorResize : undefined}
+              />
+            ) : (
+              editorElement
+            )}
           </div>
         </div>
         <UpdateBanner status={updateStatus} actions={updateActions} locale={appLocale} />

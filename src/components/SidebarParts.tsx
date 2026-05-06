@@ -34,6 +34,13 @@ function resolveSectionColors(type: string, customColor?: string | null) {
 export function isSelectionActive(current: SidebarSelection, check: SidebarSelection): boolean {
   if (current.kind !== check.kind) return false
   switch (check.kind) {
+    case 'graph': {
+      const a = current as typeof check
+      const b = check
+      if (a.mode !== b.mode) return false
+      if (a.mode === 'global' || b.mode === 'global') return a.mode === b.mode
+      return a.focus.path === b.focus.path
+    }
     case 'filter': return (current as typeof check).filter === check.filter
     case 'sectionGroup': return (current as typeof check).type === check.type
     case 'folder': return (current as typeof check).path === check.path

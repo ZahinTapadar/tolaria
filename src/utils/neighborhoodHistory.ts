@@ -27,6 +27,12 @@ export function selectionsEqual(a: SidebarSelection, b: SidebarSelection): boole
   if (a.kind !== b.kind) return false
 
   switch (a.kind) {
+    case 'graph': {
+      const other = b as Extract<SidebarSelection, { kind: 'graph' }>
+      if (a.mode !== other.mode) return false
+      if (a.mode === 'global' || other.mode === 'global') return a.mode === other.mode
+      return a.focus.path === other.focus.path
+    }
     case 'filter':
       return isSameFilterSelection(a, b as Extract<SidebarSelection, { kind: 'filter' }>)
     case 'sectionGroup':

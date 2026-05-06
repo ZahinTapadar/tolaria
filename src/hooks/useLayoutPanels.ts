@@ -6,6 +6,8 @@ export const COLUMN_MIN_WIDTHS = {
   noteList: 220,
   editor: 800,
   inspector: 240,
+  graphPane: 320,
+  graphEditor: 360,
 } as const
 
 const COLUMN_MAX_WIDTHS = {
@@ -74,6 +76,7 @@ function savePanelWidths(widths: PanelWidths): void {
 export function useLayoutPanels(options?: { initialInspectorCollapsed?: boolean }) {
   const [panelWidths, setPanelWidths] = useState(loadPanelWidths)
   const [inspectorCollapsed, setInspectorCollapsed] = useState(options?.initialInspectorCollapsed ?? true)
+  const [graphEditorWidth, setGraphEditorWidth] = useState(560)
 
   useEffect(() => {
     savePanelWidths(panelWidths)
@@ -90,6 +93,13 @@ export function useLayoutPanels(options?: { initialInspectorCollapsed?: boolean 
   const handleNoteListResize = useCallback((delta: number) => resizePanel('noteList', delta), [resizePanel])
   const handleInspectorResize = useCallback((delta: number) => resizePanel('inspector', -delta), [resizePanel])
 
+  const handleGraphEditorResize = useCallback(
+    (delta: number) => setGraphEditorWidth((w) =>
+      Math.max(COLUMN_MIN_WIDTHS.graphEditor, Math.min(1100, w - delta))
+    ),
+    [],
+  )
+
   return {
     sidebarWidth: panelWidths.sidebar,
     noteListWidth: panelWidths.noteList,
@@ -99,5 +109,7 @@ export function useLayoutPanels(options?: { initialInspectorCollapsed?: boolean 
     handleSidebarResize,
     handleNoteListResize,
     handleInspectorResize,
+    graphEditorWidth,
+    handleGraphEditorResize,
   }
 }
