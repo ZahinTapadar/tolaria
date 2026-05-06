@@ -97,6 +97,27 @@
 }
 
 @font-face {
+  font-family: 'Paragon';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Paragon-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Sinistre';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Sinistre-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Williwaw';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Williwaw-Book.otf') format('opentype');
+}
+
+@font-face {
   font-family: 'Meslo LG S';
   font-style: normal;
   font-weight: 400;
@@ -144,7 +165,9 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --font-editor: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-editor: 'Bear Sans UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Bear Sans UI Heading', 'Bear Sans UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Meslo LG S', 'IBM Plex Mono', ui-monospace, monospace;
 
   /* --- Semantic surfaces (light mode) --- */
   --surface-app: #FFFFFF;
