@@ -2,6 +2,129 @@
 @import "tw-animate-css";
 
 /* ============================================================
+   Fonts
+   ============================================================ */
+
+@font-face {
+  font-family: 'Bear Sans UI';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/BearSansUI-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/BearSansUI-Italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI';
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/BearSansUI-Medium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI';
+  font-style: italic;
+  font-weight: 500;
+  src: url('/fonts/BearSansUI-MediumItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/BearSansUI-Bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI';
+  font-style: italic;
+  font-weight: 700;
+  src: url('/fonts/BearSansUI-BoldItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI Heading';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/BearSansUIHeading-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI Heading';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/BearSansUIHeading-RegularItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI Heading';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/BearSansUIHeading-Bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Bear Sans UI Heading';
+  font-style: italic;
+  font-weight: 700;
+  src: url('/fonts/BearSansUIHeading-BoldItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Funnel Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/FunnelSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Funnel Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/FunnelSans-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Funnel Display';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/FunnelDisplay-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Meslo LG S';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/MesloLGS NF Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Meslo LG S';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/MesloLGS NF Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Meslo LG S';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/MesloLGS NF Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Meslo LG S';
+  font-style: italic;
+  font-weight: 700;
+  src: url('/fonts/MesloLGS NF Bold Italic.ttf') format('truetype');
+}
+
+/* ============================================================
    Theme Variables — app-owned light/dark contract
    ============================================================ */
 
