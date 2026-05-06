@@ -166,3 +166,7 @@ proposed → active → superseded
 | [0110](0110-in-app-media-and-pdf-file-previews.md) | In-app media and PDF previews for binary vault files | active |
 | [0111](0111-path-aware-external-vault-refresh-with-focused-editor-preservation.md) | Path-aware external vault refresh with focused-editor preservation | active |
 | [0112](0112-system-theme-mode.md) | System theme mode | active |
+| [0113](0113-python-editor-auto-install.md) | Python editor auto-install and save functionality | active |
+| [0114](0114-python-editor-output-capture.md) | Python editor output capture for plots | active |
+| [0115](0115-editor-close-button.md) | Editor close button for note pane | active |
+| [0116](0116-note-folder-organization.md) | Hierarchical folder organization for notes, code, and images | active |

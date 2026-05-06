@@ -22,6 +22,13 @@ pub fn delete_vault_folder(vault_path: String, folder_path: String) -> Result<St
     vault::delete_folder(std::path::Path::new(vault_path.as_ref()), &folder_path)
 }
 
+#[tauri::command]
+pub fn create_dir_all(path: String) -> Result<(), String> {
+    let path = expand_tilde(&path);
+    std::fs::create_dir_all(&*path)
+        .map_err(|e| format!("Failed to create directory {}: {}", path, e))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

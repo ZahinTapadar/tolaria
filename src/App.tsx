@@ -47,6 +47,7 @@ import { useEntryActions } from './hooks/useEntryActions'
 import { useAppCommands } from './hooks/useAppCommands'
 import { triggerCommitEntryAction } from './utils/commitEntryAction'
 import { generateCommitMessage } from './utils/commitMessage'
+import { getCodeFolderPaths, ensureDirectory } from './utils/noteFolderPaths'
 import { useDialogs } from './hooks/useDialogs'
 import { useVaultSwitcher } from './hooks/useVaultSwitcher'
 import { useGitHistory } from './hooks/useGitHistory'
@@ -1711,8 +1712,12 @@ function App() {
   const isEditorMode = ['python', 'sqlite', 'desmos', 'cpp'].includes(effectiveSelection.kind)
 
   const handleSavePythonCode = useCallback(async (code: string, title: string, plots: string[]) => {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-    const filename = `python-${timestamp}.md`
+    // Get folder paths using the new organization structure
+    const paths = getCodeFolderPaths(resolvedPath, title)
+    
+    // Ensure folder structure exists
+    await ensureDirectory(paths.folderPath)
+    await ensureDirectory(paths.attachmentsPath)
     
     // Build content with code and embedded plots
     let content = `---\ntitle: ${title}\ncreated: ${new Date().toISOString()}\ntype: code\n---\n\n## Code\n\n\`\`\`python\n${code}\n\`\`\`\n`
@@ -1732,10 +1737,10 @@ function App() {
       })
     }
     
-    const path = `${resolvedPath}/${filename}`
-    await persistContent(path, content)
+    const filename = paths.codePath.split('/').pop() || 'script.md'
+    await persistContent(paths.codePath, content)
     vault.addEntry({
-      path,
+      path: paths.codePath,
       filename,
       title,
       isA: null,
@@ -1770,13 +1775,21 @@ function App() {
   }, [resolvedPath, vault.addEntry])
 
   const handleSavePythonImages = useCallback(async (plots: string[], titles: string[]) => {
+    // Use Code folder structure for generated images
+    const codeTitle = `Python Plots - ${new Date().toLocaleString()}`
+    const paths = getCodeFolderPaths(resolvedPath, codeTitle)
+    
+    // Ensure folder structure exists
+    await ensureDirectory(paths.folderPath)
+    await ensureDirectory(paths.attachmentsPath)
+    
     for (let idx = 0; idx < plots.length; idx++) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
       const plotData = plots[idx]
       // Check if it's HTML (plotly) or base64 image (matplotlib)
       const isHtml = plotData.trim().startsWith('<')
       if (isHtml) {
-        // Save as HTML file with embedded plotly
+        // Save as HTML file in attachments folder
         const filename = `plot-${idx + 1}-${timestamp}.html`
         const content = `<!DOCTYPE html>
 <html>
@@ -1788,7 +1801,7 @@ function App() {
   ${plotData}
 </body>
 </html>`
-        const path = `${resolvedPath}/${filename}`
+        const path = `${paths.attachmentsPath}/${filename}`
         await persistContent(path, content)
         vault.addEntry({
           path,
@@ -1826,7 +1839,7 @@ function App() {
         // Save as markdown with base64 image
         const filename = `plot-${idx + 1}-${timestamp}.md`
         const content = `---\ntitle: ${titles[idx]}\ncreated: ${new Date().toISOString()}\ntype: image\n---\n\n![${titles[idx]}](data:image/png;base64,${plotData})\n`
-        const path = `${resolvedPath}/${filename}`
+        const path = `${paths.attachmentsPath}/${filename}`
         // Save content to file
         await persistContent(path, content)
         // Add entry to vault

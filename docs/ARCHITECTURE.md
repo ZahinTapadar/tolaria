@@ -92,6 +92,32 @@ flowchart LR
 5. **Cache is disposable**: The `reload_vault` command deletes the cache file before rescanning, guaranteeing fresh data. The cache never contains data that doesn't exist on the filesystem.
 6. **Visibility filters are command-boundary concerns**: Gitignored-content visibility is applied after scanning/caching, before entries, folders, or search results reach React. The cache remains complete so toggling the setting can show ignored content again without rebuilding a different cache shape. Large folder filtering runs on the blocking Tokio pool and drains `git check-ignore` output while feeding stdin so broad ignore matches cannot freeze the native UI thread.
 
+#### Folder Organization
+
+Tolaria supports hierarchical folder structures for organizing notes and their associated assets. See [ADR-0116](./adr/0116-note-folder-organization.md) for full details.
+
+**Default structure:**
+
+```
+vault/
+├── Notes/                    # All markdown notes
+│   └── {Note-Title}/         # Per-note folder (named after title)
+│       ├── {Note-Title}.md   # The note itself
+│       └── images/           # Associated images
+├── Code/                     # Generated code notes
+│   └── {Script-Name}/
+│       ├── {Script-Name}.md  # Code + embedded outputs
+│       └── outputs/          # Generated plots/exports
+└── (other files at root)
+```
+
+**Key principles:**
+- Notes are organized under `Notes/` with per-note subfolders
+- Code outputs go under `Code/` with per-script subfolders
+- Images associated with a note live in that note's `images/` subfolder
+- Code-generated outputs live in the script's `outputs/` subfolder
+- Folder paths are derived from note titles (sanitized for filesystem safety)
+
 #### External Change Detection
 
 The main window starts a native watcher for the active vault through `start_vault_watcher` / `stop_vault_watcher` (`src-tauri/src/vault_watcher.rs`, backed by Rust `notify`). The watcher emits `vault-changed` events for content paths and ignores churn from `.git/`, `node_modules/`, temp files, and `.tolaria-rename-txn`. `useVaultWatcher` batches those events, suppresses recent app-owned saves, and sends the remaining external paths through `refreshPulledVaultState()` so folders, saved views, note-list state, and the clean active editor all refresh under the ADR-0071 unsaved-edit rules. `useVaultLoader.isReloading` drives the status-bar reload spinner for both manual and watcher-triggered reloads.
