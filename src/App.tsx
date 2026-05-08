@@ -13,6 +13,7 @@ import { Toast } from './components/Toast'
 import { CommitDialog } from './components/CommitDialog'
 import { PulseView } from './components/PulseView'
 import { GraphView } from './components/GraphView'
+import { EditorContainer } from './components/editors/EditorContainer'
 import { StatusBar } from './components/StatusBar'
 import { SettingsPanel } from './components/SettingsPanel'
 import { CloneVaultModal } from './components/CloneVaultModal'
@@ -1713,6 +1714,7 @@ function App() {
   const isVaultContentLoading = !noteWindowParams && (isStartupLoading || (onboarding.state.status === 'ready' && vault.isLoading))
 
   const isGraphMode = effectiveSelection.kind === 'graph'
+  const isEditorMode = effectiveSelection.kind === 'editor'
   const editorElement = (
     <Editor
       tabs={notes.tabs}
@@ -1794,7 +1796,7 @@ function App() {
               <ResizeHandle onResize={layout.handleSidebarResize} />
             </>
           )}
-          {noteListVisible && effectiveSelection.kind !== 'graph' && (
+          {noteListVisible && effectiveSelection.kind !== 'graph' && !isEditorMode && (
             <>
               <div className={`app__note-list${aiActivity.highlightElement === 'notelist' ? ' ai-highlight' : ''}`} style={{ width: layout.noteListWidth }}>
                 {effectiveSelection.kind === 'filter' && effectiveSelection.filter === 'pulse' ? (
@@ -1807,7 +1809,18 @@ function App() {
             </>
           )}
           <div className={`app__editor${aiActivity.highlightElement === 'editor' || aiActivity.highlightElement === 'tab' ? ' ai-highlight' : ''}`}>
-            {isGraphMode ? (
+            {isEditorMode ? (
+              <EditorContainer
+                kind={(effectiveSelection as { kind: 'editor'; editor: 'python' | 'sqlite' | 'desmos' }).editor}
+                locale={appLocale}
+                vaultSaveDeps={resolvedPath ? {
+                  vaultPath: resolvedPath,
+                  addEntry: vault.addEntry,
+                  addPendingSave: handleCreatedVaultEntryPersisting,
+                  onNewNotePersisted: handleCreatedVaultEntryPersisted,
+                } : null}
+              />
+            ) : isGraphMode ? (
               <GraphView
                 entries={vault.entries}
                 selection={effectiveSelection as SidebarSelection & { kind: 'graph' }}

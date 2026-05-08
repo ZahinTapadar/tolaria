@@ -1,47 +1,59 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export function usePyodide() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isReady, setIsReady] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const pyodideRef = useRef<unknown>(null)
+/** Module-level singleton — survives component remounts. */
+let pyodideSingleton: unknown = null
+let pyodideInitPromise: Promise<unknown> | null = null
 
-  useEffect(() => {
-    let cancelled = false
+async function getOrInitPyodide(): Promise<unknown> {
+  if (pyodideSingleton) return pyodideSingleton
+  if (pyodideInitPromise) return pyodideInitPromise
 
-    async function init() {
-      try {
-        await loadPyodideScript()
-        if (cancelled) return
-
-        const pyodide = await window.loadPyodide!({
-          indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/',
-        })
-        if (cancelled) return
-
-        await (pyodide as { runPythonAsync: (code: string) => Promise<void> }).runPythonAsync(`
+  pyodideInitPromise = (async () => {
+    await loadPyodideScript()
+    const pyodide = await window.loadPyodide!({
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.20.0/full/',
+    })
+    await (pyodide as { runPythonAsync: (code: string) => Promise<void> }).runPythonAsync(`
 import sys
 import io
 sys.stdout = io.StringIO()
 sys.stderr = io.StringIO()
-        `)
+    `)
+    window.pyodideInstance = pyodide
+    pyodideSingleton = pyodide
+    return pyodide
+  })()
 
-        window.pyodideInstance = pyodide
-        pyodideRef.current = pyodide
+  return pyodideInitPromise
+}
 
-        if (!cancelled) {
-          setIsReady(true)
-          setIsLoading(false)
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load Pyodide')
-          setIsLoading(false)
-        }
-      }
+export function usePyodide() {
+  const [isLoading, setIsLoading] = useState(() => pyodideSingleton === null)
+  const [isReady, setIsReady] = useState(() => pyodideSingleton !== null)
+  const [error, setError] = useState<string | null>(null)
+  const pyodideRef = useRef<unknown>(pyodideSingleton)
+
+  useEffect(() => {
+    if (pyodideSingleton) {
+      pyodideRef.current = pyodideSingleton
+      return
     }
 
-    init()
+    let cancelled = false
+
+    getOrInitPyodide()
+      .then((pyodide) => {
+        if (cancelled) return
+        pyodideRef.current = pyodide
+        setIsReady(true)
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        pyodideInitPromise = null
+        setError(err instanceof Error ? err.message : 'Failed to load Pyodide')
+        setIsLoading(false)
+      })
 
     return () => {
       cancelled = true

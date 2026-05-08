@@ -1,4 +1,4 @@
-import { Archive, FileText, Graph, Tray } from '@phosphor-icons/react'
+import { Archive, FileText, Graph, Tray, Terminal, Database, ChartLine } from '@phosphor-icons/react'
 import type { SidebarSelection } from '../../types'
 import { isSelectionActive, NavItem } from '../SidebarParts'
 import { translate, type AppLocale } from '../../lib/i18n'
@@ -66,6 +66,24 @@ export function SidebarTopNav({
         label={translate(locale, 'sidebar.nav.graph')}
         isActive={selection.kind === 'graph'}
         onClick={() => onSelect({ kind: 'graph', mode: 'global' })}
+      />
+      <NavItem
+        icon={Terminal}
+        label={translate(locale, 'sidebar.nav.python')}
+        isActive={selection.kind === 'editor' && selection.editor === 'python'}
+        onClick={() => onSelect({ kind: 'editor', editor: 'python' })}
+      />
+      <NavItem
+        icon={Database}
+        label={translate(locale, 'sidebar.nav.sqlite')}
+        isActive={selection.kind === 'editor' && selection.editor === 'sqlite'}
+        onClick={() => onSelect({ kind: 'editor', editor: 'sqlite' })}
+      />
+      <NavItem
+        icon={ChartLine}
+        label={translate(locale, 'sidebar.nav.desmos')}
+        isActive={selection.kind === 'editor' && selection.editor === 'desmos'}
+        onClick={() => onSelect({ kind: 'editor', editor: 'desmos' })}
       />
     </div>
   )

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Terminal, Play, Trash, Upload, FloppyDisk, Image } from '@phosphor-icons/react'
 import { Button } from '../ui/button'
 import { usePyodide } from './hooks/usePyodide'
+import { usePersistentCode } from './hooks/useEditorPersistence'
+import { useEditorFileSave } from './hooks/useEditorFileSave'
+import { useEditorVaultSave, type EditorVaultSaveDeps } from './hooks/useEditorVaultSave'
 import { githubDark } from '@uiw/codemirror-theme-github'
 import { githubLight } from '@uiw/codemirror-theme-github'
 import { python } from '@codemirror/lang-python'
@@ -11,8 +14,7 @@ import { type AppLocale } from '../../lib/i18n'
 
 interface PythonEditorProps {
   locale: AppLocale
-  onSaveCode?: (code: string, title: string, plots: string[]) => void
-  onSaveImages?: (plots: string[], titles: string[]) => void
+  vaultSaveDeps: EditorVaultSaveDeps | null
 }
 
 interface OutputItem {
@@ -28,9 +30,11 @@ print("Hello from Python!")
 print(f"Random number: {random.randint(1, 100)}")
 `
 
-export function PythonEditor({ locale: _locale, onSaveCode, onSaveImages: onSaveImagesProp }: PythonEditorProps) {
+export function PythonEditor({ locale: _locale, vaultSaveDeps }: PythonEditorProps) {
   const { isLoading, isReady, error, runPythonWithAutoInstall, writeFile, readDir } = usePyodide()
-  const [code, setCode] = useState(DEFAULT_CODE)
+  const [code, setCode] = usePersistentCode('python', DEFAULT_CODE)
+  const { saveHtml } = useEditorFileSave()
+  const { saveCodeNote, saveImageWithNote } = useEditorVaultSave(vaultSaveDeps)
   const [output, setOutput] = useState<OutputItem[]>([])
   const [isRunning, setIsRunning] = useState(false)
   const [progress, setProgress] = useState('')
@@ -100,19 +104,22 @@ export function PythonEditor({ locale: _locale, onSaveCode, onSaveImages: onSave
     setProgress('')
   }, [])
 
-  const handleSaveCode = useCallback(() => {
-    const title = `Python Script - ${new Date().toLocaleString()}`
-    const plots = output.filter((item) => item.isImage || item.isHtml).map((item) => item.text)
-    onSaveCode?.(code, title, plots)
-  }, [code, output, onSaveCode])
+  const handleSaveCode = useCallback(async () => {
+    await saveCodeNote(code, 'python')
+  }, [code, saveCodeNote])
 
-  const handleSaveImages = useCallback(() => {
+  const handleSaveImages = useCallback(async () => {
     const plots = output.filter((item) => item.isImage || item.isHtml)
     if (plots.length === 0) return
-    const plotData = plots.map((plot) => plot.text)
-    const titles = plots.map((_, idx) => `Plot ${idx + 1} - ${new Date().toLocaleString()}`)
-    onSaveImagesProp?.(plotData, titles)
-  }, [output, onSaveImagesProp])
+    for (let i = 0; i < plots.length; i++) {
+      const item = plots[i]
+      if (item.isImage) {
+        await saveImageWithNote(item.text, i)
+      } else if (item.isHtml) {
+        await saveHtml(item.text, `plot_${i + 1}_${Date.now()}.html`)
+      }
+    }
+  }, [output, saveHtml, saveImageWithNote])
 
   const handleClearCode = useCallback(() => {
     setCode('')

@@ -3,27 +3,21 @@ import { DesmosEditor } from './DesmosEditor'
 import { SqliteEditor } from './SqliteEditor'
 import { type EditorKind } from './types'
 import { type AppLocale } from '../../lib/i18n'
+import { type EditorVaultSaveDeps } from './hooks/useEditorVaultSave'
 
 interface EditorContainerProps {
   kind: EditorKind
   locale: AppLocale
-  onSaveCode?: (code: string, title: string, plots: string[]) => void
-  onSaveImages?: (plots: string[], titles: string[]) => void
+  vaultSaveDeps?: EditorVaultSaveDeps | null
 }
 
-export function EditorContainer({ kind, locale, onSaveCode, onSaveImages }: EditorContainerProps) {
+export function EditorContainer({ kind, locale, vaultSaveDeps }: EditorContainerProps) {
   if (kind === 'python') {
-    return (
-      <PythonEditor
-        locale={locale}
-        onSaveCode={onSaveCode}
-        onSaveImages={onSaveImages}
-      />
-    )
+    return <PythonEditor locale={locale} vaultSaveDeps={vaultSaveDeps ?? null} />
   }
 
   if (kind === 'sqlite') {
-    return <SqliteEditor locale={locale} />
+    return <SqliteEditor locale={locale} vaultSaveDeps={vaultSaveDeps ?? null} />
   }
 
   if (kind === 'desmos') {

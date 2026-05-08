@@ -214,6 +214,7 @@ export type SidebarSelection =
   | { kind: 'folder'; path: string; rootPath?: string }
   | { kind: 'entity'; entry: VaultEntry }
   | { kind: 'view'; filename: string }
+  | { kind: 'editor'; editor: 'python' | 'sqlite' | 'desmos' }
 
 // --- Custom Views ---
 

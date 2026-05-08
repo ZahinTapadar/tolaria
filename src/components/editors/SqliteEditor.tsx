@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Database, Play, Trash } from '@phosphor-icons/react'
+import { Database, Play, Trash, FloppyDisk } from '@phosphor-icons/react'
 import { Button } from '../ui/button'
 import { useSqlJs, type QueryResult } from './hooks/useSqlJs'
+import { usePersistentCode } from './hooks/useEditorPersistence'
+import { useEditorVaultSave, type EditorVaultSaveDeps } from './hooks/useEditorVaultSave'
 import { githubDark } from '@uiw/codemirror-theme-github'
 import { githubLight } from '@uiw/codemirror-theme-github'
 import { sql } from '@codemirror/lang-sql'
@@ -11,6 +13,7 @@ import { translate, type AppLocale } from '../../lib/i18n'
 
 interface SqliteEditorProps {
   locale: AppLocale
+  vaultSaveDeps: EditorVaultSaveDeps | null
 }
 
 const DEFAULT_CODE = `-- Create a sample table
@@ -20,9 +23,10 @@ INSERT INTO employees (name, role) VALUES ('Alice', 'Engineer'), ('Bob', 'Design
 -- Select data
 SELECT * FROM employees;`
 
-export function SqliteEditor({ locale }: SqliteEditorProps) {
+export function SqliteEditor({ locale, vaultSaveDeps }: SqliteEditorProps) {
   const { isLoading, isReady, error, execute } = useSqlJs()
-  const [code, setCode] = useState(DEFAULT_CODE)
+  const [code, setCode] = usePersistentCode('sqlite', DEFAULT_CODE)
+  const { saveCodeNote } = useEditorVaultSave(vaultSaveDeps)
   const [results, setResults] = useState<QueryResult[]>([])
   const [execError, setExecError] = useState<string | null>(null)
   const [isExecuting, setIsExecuting] = useState(false)
@@ -38,19 +42,16 @@ export function SqliteEditor({ locale }: SqliteEditorProps) {
   const handleExecute = useCallback(() => {
     setIsExecuting(true)
     setExecError(null)
+    try {
+      const result = execute(code)
+      setResults(result ?? [])
+    } catch (err) {
+      setExecError(err instanceof Error ? err.message : 'Unknown error')
+    }
+    setIsExecuting(false)
 
     setTimeout(() => {
-      const result = execute(code)
-      if (result === null) {
-        setExecError('Execution failed')
-      } else {
-        setResults(result)
-      }
-      setIsExecuting(false)
-
-      setTimeout(() => {
-        outputRef.current?.scrollTo(0, outputRef.current.scrollHeight)
-      }, 50)
+      outputRef.current?.scrollTo(0, outputRef.current.scrollHeight)
     }, 50)
   }, [code, execute])
 
@@ -58,6 +59,10 @@ export function SqliteEditor({ locale }: SqliteEditorProps) {
     setResults([])
     setExecError(null)
   }, [])
+
+  const handleSaveCode = useCallback(async () => {
+    await saveCodeNote(code, 'sql')
+  }, [code, saveCodeNote])
 
   const renderTable = (columns: string[], values: (string | number | null)[][]) => {
     if (!columns.length) {
@@ -99,6 +104,10 @@ export function SqliteEditor({ locale }: SqliteEditorProps) {
           {isLoading && (
             <span className="text-xs text-muted-foreground">{translate(locale, 'editor.loading')}</span>
           )}
+          <Button size="sm" variant="outline" onClick={handleSaveCode} disabled={!code}>
+            <FloppyDisk size={14} className="mr-1" />
+            Save
+          </Button>
           <Button
             size="sm"
             onClick={handleExecute}
