@@ -3,9 +3,10 @@ import { useCallback, useEffect, useState } from 'react'
 const STORAGE_KEYS = {
   python: 'tolaria-editor-python-code',
   sqlite: 'tolaria-editor-sqlite-code',
+  cpp: 'tolaria-editor-cpp-code',
 } as const
 
-export function usePersistentCode(editor: 'python' | 'sqlite', defaultCode: string): [string, (code: string) => void] {
+export function usePersistentCode(editor: 'python' | 'sqlite' | 'cpp', defaultCode: string): [string, (code: string) => void] {
   const key = STORAGE_KEYS[editor]
 
   const [code, setCodeState] = useState<string>(() => {

@@ -1,6 +1,7 @@
 import { PythonEditor } from './PythonEditor'
 import { DesmosEditor } from './DesmosEditor'
 import { SqliteEditor } from './SqliteEditor'
+import { CppEditor } from './CppEditor'
 import { type EditorKind } from './types'
 import { type AppLocale } from '../../lib/i18n'
 import { type EditorVaultSaveDeps } from './hooks/useEditorVaultSave'
@@ -22,6 +23,10 @@ export function EditorContainer({ kind, locale, vaultSaveDeps }: EditorContainer
 
   if (kind === 'desmos') {
     return <DesmosEditor locale={locale} />
+  }
+
+  if (kind === 'cpp') {
+    return <CppEditor locale={locale} vaultSaveDeps={vaultSaveDeps ?? null} />
   }
 
   return null

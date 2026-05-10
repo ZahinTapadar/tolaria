@@ -55,16 +55,18 @@ function uniqueSlug(base: string): string {
 }
 
 export function useEditorVaultSave(deps: EditorVaultSaveDeps | null) {
-  const saveCodeNote = useCallback(async (code: string, language: 'python' | 'sql') => {
+  const saveCodeNote = useCallback(async (code: string, language: 'python' | 'sql' | 'cpp') => {
     if (!deps) return
     const { vaultPath, addEntry, addPendingSave, onNewNotePersisted } = deps
     const timestamp = new Date().toLocaleString('en-US', {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
     })
-    const title = `${language === 'python' ? 'Python' : 'SQLite'} — ${timestamp}`
-    const slug = uniqueSlug(language === 'python' ? 'python-script' : 'sqlite-query')
+    const languageLabel = language === 'python' ? 'Python' : language === 'sql' ? 'SQLite' : 'C/C++'
+    const slugPrefix = language === 'python' ? 'python-script' : language === 'sql' ? 'sqlite-query' : 'cpp-code'
+    const title = `${languageLabel} — ${timestamp}`
+    const slug = uniqueSlug(slugPrefix)
     const entry = makeCodeEntry(title, slug, vaultPath)
-    const content = buildCodeNote(title, code, language === 'python' ? 'python' : 'sql')
+    const content = buildCodeNote(title, code, language === 'cpp' ? 'cpp' : language === 'python' ? 'python' : 'sql')
 
     addPendingSave(entry.path)
     try {

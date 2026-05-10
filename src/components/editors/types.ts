@@ -27,6 +27,10 @@ declare global {
     // SQL.js
     initSqlJs?: (config: { locateFile: (file: string) => string }) => Promise<unknown>
 
+    // C/C++
+    getCppCode?: () => string
+    setCppCode?: (code: string) => void
+
     // Desmos
     Desmos?: {
       GraphingCalculator: (element: HTMLElement, options: unknown) => {
@@ -39,4 +43,4 @@ declare global {
   }
 }
 
-export type EditorKind = 'python' | 'sqlite' | 'desmos'
+export type EditorKind = 'python' | 'sqlite' | 'desmos' | 'cpp'
