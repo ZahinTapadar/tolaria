@@ -2,7 +2,65 @@
 @import "tw-animate-css";
 
 /* ============================================================
-   Fonts
+   Fonts — Luxury Minimal Editorial Stack
+   ============================================================ */
+
+/* Iowan Old Style — The Soul (Serif Display) */
+@font-face {
+  font-family: 'Iowan Old Style';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Iowan Old Style'), local('IowanOldStyle'), local('Iowan Old Style BT'),
+       url('/fonts/IowanOldStyle-Roman.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Iowan Old Style';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Iowan Old Style Italic'), local('IowanOldStyle-Italic'),
+       url('/fonts/IowanOldStyle-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Iowan Old Style';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Iowan Old Style Bold'), local('IowanOldStyle-Bold'),
+       url('/fonts/IowanOldStyle-Bold.woff2') format('woff2');
+}
+
+/* JetBrains Mono — The Structure (Technical Monospace) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/JetBrainsMono-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+/* ============================================================
+   Legacy Fonts (kept for compatibility)
    ============================================================ */
 
 @font-face {
@@ -165,38 +223,44 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --font-editor: 'Bear Sans UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Bear Sans UI Heading', 'Bear Sans UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'Meslo LG S', 'IBM Plex Mono', ui-monospace, monospace;
+  /* Luxury Minimal Editorial — Typography Stack */
+  --font-editor: -apple-system, 'SF Pro Text', 'Inter', BlinkMacSystemFont, sans-serif;
+  --font-display: 'Iowan Old Style', 'Charter', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono', 'Meslo LG S', ui-monospace, monospace;
 
-  /* --- Semantic surfaces (light mode) --- */
-  --surface-app: #FFFFFF;
-  --surface-sidebar: #F7F6F3;
-  --surface-panel: #FFFFFF;
-  --surface-card: #FFFFFF;
-  --surface-popover: #FFFFFF;
-  --surface-input: #FFFFFF;
-  --surface-button: #EBEBEA;
-  --surface-dialog: #FFFFFF;
-  --surface-editor: #FFFFFF;
-  --surface-overlay: rgba(0, 0, 0, 0.3);
+  /* --- Semantic surfaces (light mode) — Luxury Minimal Editorial --- */
+  --surface-app: #fafaf9;
+  --surface-sidebar: #f5f5f4;
+  --surface-panel: #ffffff;
+  --surface-card: #ffffff;
+  --surface-popover: #ffffff;
+  --surface-input: #ffffff;
+  --surface-button: #e7e5e4;
+  --surface-dialog: #ffffff;
+  --surface-editor: #fafaf9;
+  --surface-overlay: rgba(18, 18, 18, 0.4);
 
-  /* --- Semantic text (light mode) --- */
-  --text-primary: #37352F;
-  --text-secondary: #787774;
-  --text-tertiary: #787774;
-  --text-muted: #B4B4B4;
-  --text-faint: #B4B4B4;
-  --text-heading: #37352F;
-  --text-inverse: #FFFFFF;
+  /* --- Semantic text (light mode) — Luxury Minimal Editorial --- */
+  --text-primary: #121212;
+  --text-secondary: #57534e;
+  --text-tertiary: #78716c;
+  --text-muted: #a8a29e;
+  --text-faint: #d6d3d1;
+  --text-heading: #121212;
+  --text-inverse: #fafaf9;
 
-  /* --- Semantic borders (light mode) --- */
-  --border-default: #E9E9E7;
-  --border-subtle: #E9E9E7;
-  --border-strong: #D9D9D6;
-  --border-input: #E9E9E7;
-  --border-dialog: #E9E9E7;
-  --border-focus: #155DFF;
+  /* --- Luxury Accent --- */
+  --luxury-accent: #e8602b;
+  --luxury-accent-light: rgba(232, 96, 43, 0.1);
+  --luxury-accent-hover: #d45520;
+
+  /* --- Semantic borders (light mode) — 0.5px hairline --- */
+  --border-default: 0.5px solid #e7e5e4;
+  --border-subtle: 0.5px solid #f0f0ef;
+  --border-strong: 0.5px solid #d6d3d1;
+  --border-input: 0.5px solid #e7e5e4;
+  --border-dialog: 0.5px solid #e7e5e4;
+  --border-focus: #e8602b;
 
   /* --- Interaction states (light mode) --- */
   --state-hover: #EBEBEA;
@@ -321,34 +385,39 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  /* --- Semantic surfaces (dark mode) --- */
-  --surface-app: #1F1E1B;
-  --surface-sidebar: #191814;
-  --surface-panel: #23221F;
-  --surface-card: #23221F;
-  --surface-popover: #292823;
-  --surface-input: #1F1E1B;
-  --surface-button: #34322D;
-  --surface-dialog: #272622;
-  --surface-editor: #1F1E1B;
-  --surface-overlay: rgba(8, 8, 7, 0.58);
+  /* --- Semantic surfaces (dark mode) — Luxury Near-Black --- */
+  --surface-app: #121212;
+  --surface-sidebar: #0a0a0a;
+  --surface-panel: #1a1a1a;
+  --surface-card: #1a1a1a;
+  --surface-popover: #1f1f1f;
+  --surface-input: #121212;
+  --surface-button: #2a2a2a;
+  --surface-dialog: #1a1a1a;
+  --surface-editor: #121212;
+  --surface-overlay: rgba(0, 0, 0, 0.7);
 
-  /* --- Semantic text (dark mode) --- */
-  --text-primary: #E6E1D8;
-  --text-secondary: #B8B1A6;
-  --text-tertiary: #9C9488;
-  --text-muted: #7F776D;
-  --text-faint: #625B53;
-  --text-heading: #F1ECE3;
-  --text-inverse: #151411;
+  /* --- Semantic text (dark mode) — Soft Paper-White Tones --- */
+  --text-primary: #fafaf9;
+  --text-secondary: #e7e5e4;
+  --text-tertiary: #a8a29e;
+  --text-muted: #78716c;
+  --text-faint: #57534e;
+  --text-heading: #fafaf9;
+  --text-inverse: #121212;
 
-  /* --- Semantic borders (dark mode) --- */
-  --border-default: #34322D;
-  --border-subtle: #2A2925;
-  --border-strong: #46433B;
-  --border-input: #3A3832;
-  --border-dialog: #3A3832;
-  --border-focus: #78A4FF;
+  /* --- Luxury Accent (same in dark mode) --- */
+  --luxury-accent: #e8602b;
+  --luxury-accent-light: rgba(232, 96, 43, 0.15);
+  --luxury-accent-hover: #f0703a;
+
+  /* --- Semantic borders (dark mode) — 0.5px hairline --- */
+  --border-default: 0.5px solid #2a2a2a;
+  --border-subtle: 0.5px solid #1f1f1f;
+  --border-strong: 0.5px solid #3a3a3a;
+  --border-input: 0.5px solid #2a2a2a;
+  --border-dialog: 0.5px solid #2a2a2a;
+  --border-focus: #e8602b;
 
   /* --- Interaction states (dark mode) --- */
   --state-hover: #2D2B27;

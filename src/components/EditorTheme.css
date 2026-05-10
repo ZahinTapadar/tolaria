@@ -89,19 +89,19 @@
 /* Title (H1) — visually separated from content.
    BlockNote renders H1 without data-level, so we target :has(h1) */
 .editor__blocknote-container .bn-block-outer:has(h1) {
-  margin-top: var(--headings-h1-margin-top) !important;
-  margin-bottom: var(--headings-h1-margin-bottom) !important;
+  margin-top: 48px !important;
+  margin-bottom: 32px !important;
   padding-bottom: 16px !important;
-  border-bottom: 1px solid var(--border-primary);
+  border-bottom: 0.5px solid var(--border-default);
 }
 .editor__blocknote-container [data-content-type="heading"]:not([data-level]) .bn-inline-content,
 .editor__blocknote-container [data-content-type="heading"][data-level="1"] .bn-inline-content {
   font-family: var(--font-display);
-  font-size: var(--headings-h1-font-size);
-  font-weight: var(--headings-h1-font-weight);
-  line-height: var(--headings-h1-line-height);
-  color: var(--headings-h1-color);
-  letter-spacing: var(--headings-h1-letter-spacing);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text-heading);
+  letter-spacing: -0.04em;
 }
 .editor__blocknote-container [data-content-type="heading"]:not([data-level])[data-is-empty-and-focused] .bn-inline-content:has(> .ProseMirror-trailingBreak:only-child)::before,
 .editor__blocknote-container [data-content-type="heading"]:not([data-level])[data-is-only-empty-block] .bn-inline-content:has(> .ProseMirror-trailingBreak:only-child)::before,
@@ -116,11 +116,11 @@
 }
 .editor__blocknote-container [data-content-type="heading"][data-level="2"] .bn-inline-content {
   font-family: var(--font-display);
-  font-size: var(--headings-h2-font-size);
-  font-weight: var(--headings-h2-font-weight);
-  line-height: var(--headings-h2-line-height);
-  color: var(--headings-h2-color);
-  letter-spacing: var(--headings-h2-letter-spacing);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-heading);
+  letter-spacing: -0.02em;
 }
 
 .editor__blocknote-container .bn-block-outer:has(> .bn-block > [data-content-type="heading"][data-level="3"]) {
@@ -129,11 +129,11 @@
 }
 .editor__blocknote-container [data-content-type="heading"][data-level="3"] .bn-inline-content {
   font-family: var(--font-display);
-  font-size: var(--headings-h3-font-size);
-  font-weight: var(--headings-h3-font-weight);
-  line-height: var(--headings-h3-line-height);
-  color: var(--headings-h3-color);
-  letter-spacing: var(--headings-h3-letter-spacing);
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text-heading);
+  letter-spacing: -0.01em;
 }
 
 .editor__blocknote-container .bn-block-outer:has(> .bn-block > [data-content-type="heading"][data-level="4"]) {
@@ -603,6 +603,66 @@
 /* --- Horizontal rule --- */
 .editor__blocknote-container hr {
   border: none;
-  border-top: var(--horizontal-rule-thickness) solid var(--horizontal-rule-color);
-  margin: var(--horizontal-rule-margin-vertical) 0;
+  border-top: 0.5px solid var(--border-default);
+  margin: 48px 0;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   Luxury Minimal Editorial — Extra Details
+   ============================================================ */
+
+/* Drop Cap — First paragraph of a note gets a large serif initial */
+.editor__blocknote-container .bn-block-outer:first-of-type:has([data-content-type="paragraph"]) .bn-inline-content::first-letter,
+.editor__blocknote-container .bn-block-outer:first-of-type:has([data-content-type="paragraph"]) > .bn-block > [data-content-type="paragraph"] .bn-inline-content::first-letter {
+  font-family: var(--font-display);
+  font-size: 3.2em;
+  float: left;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  margin-top: 0.05em;
+  color: var(--text-heading);
+}
+
+/* Micro-labels — 0.65rem uppercase, letter-spaced for metadata */
+.editor__micro-label,
+.editor__blocknote-container .bn-formatting-toolbar [data-testid="toolbar-item"],
+.editor__blocknote-container .bn-side-menu .bn-drag-handle {
+  font-size: 0.65rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Hairline borders refinement — replace 1px with 0.5px where possible */
+.editor__blocknote-container .bn-block-content {
+  border-width: 0.5px !important;
+}
+
+/* Editorial line-height for body text */
+.editor__blocknote-container [data-content-type="paragraph"] .bn-inline-content {
+  line-height: 1.8;
+}
+
+/* Luxury focus states with accent color */
+.editor__blocknote-container .bn-block-content:focus-visible {
+  outline: 0.5px solid var(--luxury-accent);
+  outline-offset: 2px;
+}
+
+/* Premium glassmorphism for floating UI elements */
+.editor__blocknote-container .bn-suggestion-menu,
+.editor__blocknote-container .bn-formatting-toolbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+:root.dark .editor__blocknote-container .bn-suggestion-menu,
+:root.dark .editor__blocknote-container .bn-formatting-toolbar {
+  background: rgba(26, 26, 26, 0.9);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
