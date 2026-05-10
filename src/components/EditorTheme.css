@@ -59,11 +59,6 @@
   pointer-events: none;
 }
 
-/* More horizontal space between drag handle and content */
-.editor__blocknote-container .bn-side-menu ~ * ,
-.editor__blocknote-container [class*="bn-side-menu"] {
-  /* The side menu is positioned via transform — we shift it further left */
-}
 .editor__blocknote-container .bn-block-content {
   margin-left: 8px;
 }
@@ -490,8 +485,24 @@
 .editor__blocknote-container .bn-block-content[data-content-type="codeBlock"] {
   background-color: var(--editor-code-block-background) !important;
   border: 1px solid var(--editor-code-block-border);
+  border-radius: 8px;
   color: var(--editor-code-block-text) !important;
   position: relative;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1); /* Soft elevation shadow */
+  padding-top: 40px !important; /* Space for traffic lights */
+}
+
+/* Traffic light dots - macOS style window controls */
+.editor__blocknote-container .bn-block-content[data-content-type="codeBlock"]::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5f56; /* Red dot */
+  box-shadow: 16px 0 0 #ffbd2e, 32px 0 0 #27c93f; /* Yellow and Green dots */
 }
 
 .editor__code-block-copy {
@@ -517,13 +528,38 @@
   color: inherit;
 }
 
+/* Language selector - styled as uppercase label in top right */
+.editor__blocknote-container .bn-block-content[data-content-type="codeBlock"] > div:has(> select) {
+  position: absolute !important;
+  top: 12px !important;
+  right: 16px !important;
+  left: auto !important;
+  z-index: 10;
+}
+
 .editor__blocknote-container .bn-block-content[data-content-type="codeBlock"] > div > select {
-  color: var(--editor-code-block-language) !important;
+  color: #666 !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.6rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.editor__blocknote-container .bn-block-content[data-content-type="codeBlock"] > div > select:hover {
+  color: #999 !important;
 }
 
 .editor__blocknote-container .bn-block-content[data-content-type="codeBlock"] > div > select > option {
   background: var(--popover);
   color: var(--foreground);
+  font-size: 0.75rem;
+  text-transform: none;
 }
 
 .editor__blocknote-container .bn-block-content[data-content-type="codeBlock"] pre code {

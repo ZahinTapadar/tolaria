@@ -5,6 +5,7 @@ import {
 } from '@blocknote/react'
 import { createElement, type ReactElement } from 'react'
 import {
+  Calendar,
   CodeBlock,
   File,
   FlowArrow,
@@ -19,17 +20,20 @@ import {
   Smiley,
   SpeakerHigh,
   Table,
+  Terminal,
   TextHOne,
   TextHTwo,
   TextHThree,
   TextHFour,
   TextHFive,
   TextHSix,
+  Tray,
   Video,
   type Icon as PhosphorIcon,
 } from '@phosphor-icons/react'
 import { MERMAID_BLOCK_TYPE, mermaidFenceSource } from '../utils/mermaidMarkdown'
 import { TLDRAW_BLOCK_TYPE, TLDRAW_DEFAULT_HEIGHT } from '../utils/tldrawMarkdown'
+import { TIMELINE_BLOCK_TYPE, timelineFenceSource } from '../utils/timelineMarkdown'
 
 type TolariaSlashMenuItem = DefaultReactSuggestionItem & { key: string }
 type TolariaBlockTypeSelectItem = {
@@ -60,7 +64,6 @@ const UNSUPPORTED_FORMATTING_TOOLBAR_KEYS = new Set([
   'textAlignLeftButton',
   'textAlignCenterButton',
   'textAlignRightButton',
-  'colorStyleButton',
 ])
 
 const UNSUPPORTED_SLASH_MENU_KEYS = new Set([
@@ -105,6 +108,7 @@ const TOLARIA_SLASH_MENU_ICONS: Partial<Record<string, PhosphorIcon>> = {
   paragraph: Paragraph,
   quote: Quotes,
   table: Table,
+  timeline: Calendar,
   toggle_heading: TextHOne,
   toggle_heading_2: TextHTwo,
   toggle_heading_3: TextHThree,
@@ -149,6 +153,21 @@ function createMermaidSlashMenuItem(
     props: {
       diagram: MERMAID_SLASH_COMMAND_DIAGRAM,
       source: mermaidFenceSource({ diagram: MERMAID_SLASH_COMMAND_DIAGRAM }),
+    },
+  })
+}
+
+function createTimelineSlashMenuItem(
+  editor: Parameters<typeof getDefaultReactSlashMenuItems>[0],
+): TolariaSlashMenuItem {
+  return createBlockSlashMenuItem(editor, {
+    key: 'timeline',
+    title: 'Timeline',
+    aliases: ['gantt', 'plan', 'schedule', 'tasks'],
+    type: TIMELINE_BLOCK_TYPE,
+    props: {
+      source: timelineFenceSource({ data: { title: 'Project Plan', tasks: [] } }),
+      data: JSON.stringify({ title: 'Project Plan', tasks: [] }),
     },
   })
 }
@@ -246,6 +265,7 @@ export function getTolariaSlashMenuItems(
     [
       createMermaidSlashMenuItem(editor),
       createWhiteboardSlashMenuItem(editor),
+      createTimelineSlashMenuItem(editor),
     ],
   )
 

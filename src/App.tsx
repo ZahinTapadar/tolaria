@@ -1811,7 +1811,7 @@ function App() {
           <div className={`app__editor${aiActivity.highlightElement === 'editor' || aiActivity.highlightElement === 'tab' ? ' ai-highlight' : ''}`}>
             {isEditorMode ? (
               <EditorContainer
-                kind={(effectiveSelection as { kind: 'editor'; editor: 'python' | 'sqlite' | 'desmos' }).editor}
+                kind={(effectiveSelection as { kind: 'editor'; editor: 'python' | 'sqlite' | 'desmos' | 'cpp' }).editor}
                 locale={appLocale}
                 vaultSaveDeps={resolvedPath ? {
                   vaultPath: resolvedPath,

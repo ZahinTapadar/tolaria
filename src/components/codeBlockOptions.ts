@@ -37,11 +37,28 @@ async function createTolariaCodeHighlighter(): Promise<TolariaCodeHighlighter> {
   }
 }
 
+// Additional language definitions for syntax highlighting
+const ADDITIONAL_LANGUAGES: Record<string, { name: string; aliases?: string[] }> = {
+  bash: { name: 'Bash', aliases: ['bash', 'sh', 'shell', 'zsh'] },
+  c: { name: 'C', aliases: ['c', 'h'] },
+  cpp: { name: 'C++', aliases: ['cpp', 'c++', 'cc', 'cxx', 'hpp'] },
+  go: { name: 'Go', aliases: ['go', 'golang'] },
+  java: { name: 'Java', aliases: ['java'] },
+  kotlin: { name: 'Kotlin', aliases: ['kotlin', 'kt'] },
+  php: { name: 'PHP', aliases: ['php'] },
+  ruby: { name: 'Ruby', aliases: ['ruby', 'rb'] },
+  rust: { name: 'Rust', aliases: ['rust', 'rs'] },
+}
+
 export function createTolariaCodeBlockOptions(): Partial<CodeBlockOptions> {
   const options: Partial<CodeBlockOptions> = {
     ...codeBlockOptions,
     createHighlighter: createTolariaCodeHighlighter,
     defaultLanguage: 'text',
+    supportedLanguages: {
+      ...codeBlockOptions.supportedLanguages,
+      ...ADDITIONAL_LANGUAGES,
+    },
   }
 
   if (supportsShikiPrecompiledRegexFlags()) return options

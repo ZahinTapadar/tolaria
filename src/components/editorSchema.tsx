@@ -10,6 +10,8 @@ import { resolveWikilinkColor as resolveColor } from '../utils/wikilinkColors'
 import { resolveEntry } from '../utils/wikilink'
 import { MATH_BLOCK_TYPE, MATH_INLINE_TYPE, renderMathToHtml } from '../utils/mathMarkdown'
 import { MERMAID_BLOCK_TYPE, mermaidFenceSource } from '../utils/mermaidMarkdown'
+import { TIMELINE_BLOCK_TYPE, timelineFenceSource } from '../utils/timelineMarkdown'
+import { TimelineDiagram } from './TimelineDiagram'
 import { TLDRAW_BLOCK_TYPE, TLDRAW_DEFAULT_HEIGHT } from '../utils/tldrawMarkdown'
 import type { VaultEntry } from '../types'
 import { createTolariaCodeBlockOptions } from './codeBlockOptions'
@@ -218,6 +220,41 @@ const mathBlock = MathBlock()
 const mermaidBlock = MermaidBlock()
 const tldrawBlock = TldrawBlock()
 
+function readTimelinePreElement(element: HTMLElement): { source: string; data: string } | undefined {
+  if (element.tagName !== 'PRE') return undefined
+  if (element.childElementCount !== 1 || element.firstElementChild?.tagName !== 'CODE') return undefined
+
+  const code = element.firstElementChild
+  const language = readCodeElementLanguage(code)
+  if (language !== 'timeline' && language !== 'gantt' && language !== 'plan') return undefined
+
+  return {
+    source: timelineFenceSource({ data: { title: 'Timeline', tasks: [] } }),
+    data: JSON.stringify({ title: 'Timeline', tasks: [] }),
+  }
+}
+
+const TimelineBlock = createReactBlockSpec(
+  {
+    type: TIMELINE_BLOCK_TYPE,
+    propSchema: {
+      source: { default: '' },
+      data: { default: '{}' },
+    },
+    content: 'none',
+  },
+  {
+    runsBefore: ['codeBlock'],
+    parse: readTimelinePreElement,
+    render: (props) => {
+      const data = JSON.parse(props.block.props.data || '{}') as { title: string; tasks: unknown[] }
+      return <TimelineDiagram data={data as unknown as import('../utils/timelineMarkdown').TimelineData} />
+    },
+  },
+)
+
+const timelineBlock = TimelineBlock()
+
 export const schema = BlockNoteSchema.create({
   inlineContentSpecs: {
     ...defaultInlineContentSpecs,
@@ -229,6 +266,7 @@ export const schema = BlockNoteSchema.create({
     mathBlock,
     mermaidBlock,
     tldrawBlock,
+    timelineBlock,
     codeBlock,
   },
 })
