@@ -486,7 +486,7 @@
   "editor.save": "Save",
   "editor.code": "Code",
   "editor.sqlite.ready": "Run a query to see results",
-  "editor.cpp.notice": "Note: In-browser compilation is not available. Use this editor to write and save C/C++ code.",
+  "editor.cpp.notice": "WASM Sandbox: Simulated execution. Full LLVM would require 30MB+ WASM.",
   "inspector.title.properties": "Properties",
   "inspector.title.propertiesShortcut": "Properties (⌘⇧I)",
   "inspector.title.closePropertiesShortcut": "Close Properties (⌘⇧I)",

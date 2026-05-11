@@ -43,7 +43,7 @@ import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import unquote
+from urllib.parse import unquote, quote
 
 
 # ---------------------------------------------------------------------------
@@ -106,18 +106,35 @@ def rewrite_image_refs(body: str, note_id: str, note_asset_dir: str) -> str:
 
     def replace_image(m):
         alt = m.group(1)
-        # URL-decode the filename (e.g., %20 -> space, %40 -> @)
+        # URL-decode the filename (e.g., %20 -> space, %40 -> @) to know the real name
         filename = unquote(m.group(3))
-        # Tolaria uses standard markdown: ![](attachments/NOTE_ID/filename.png)
-        new_ref = f"attachments/{note_asset_dir}/{filename}" if note_asset_dir else f"attachments/{filename}"
-        return f"![{alt}]({new_ref})"
+        # Re-encode the filename so the markdown URL is valid (escapes spaces, etc.)
+        safe_filename = quote(filename)
+        
+        new_ref = f"attachments/{note_asset_dir}/{safe_filename}" if note_asset_dir else f"attachments/{safe_filename}"
+        
+        ext = filename.lower().split('.')[-1] if '.' in filename else ''
+        
+        # Standard Markdown doesn't support rendering videos or PDFs via `![]()`.
+        # Instead, we output HTML tags which most markdown renderers support.
+        if ext in ('mp4', 'm4v', 'mov', 'webm', 'avi', 'mkv'):
+            return f'<video src="{new_ref}" controls width="100%"></video>'
+        elif ext == 'pdf':
+            return f'<iframe src="{new_ref}" width="100%" height="500px" style="border:1px solid #ccc;"></iframe>'
+        else:
+            return f"![{alt}]({new_ref})"
 
     def replace_link(m):
         label = m.group(1)
-        # URL-decode the filename
         filename = unquote(m.group(3))
-        # For regular links (PDFs, videos), keep as markdown link but point to attachments
-        new_ref = f"attachments/{note_asset_dir}/{filename}" if note_asset_dir else f"attachments/{filename}"
+        # Re-encode the filename for the markdown link URL
+        safe_filename = quote(filename)
+        
+        new_ref = f"attachments/{note_asset_dir}/{safe_filename}" if note_asset_dir else f"attachments/{safe_filename}"
+        
+        # If the label is empty, fallback to the filename
+        if not label:
+            label = filename
         return f"[{label}]({new_ref})"
 
     body = image_pattern.sub(replace_image, body)
@@ -190,7 +207,8 @@ def copy_note_assets(
 
     count = 0
     for f in files:
-        # URL-decode the filename for the destination (e.g., %20 -> space)
+        # The filename on disk in Curated is actually already decoded.
+        # But we unquote it just in case there's any residual encoding.
         decoded_name = unquote(f.name)
         dest = dest_asset_dir / decoded_name
         if not dry_run:
